@@ -93,32 +93,127 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/player_1" />
+                android:text="Game Type" />
 
-            <EditText
-                android:id="@+id/et_player1_name"
+            <RadioGroup
+                android:id="@+id/rg_game_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:hint="@string/player_1_name_hint"
-                android:autofillHints="name"
-                android:inputType="textPersonName|textCapWords" />
+                android:orientation="horizontal">
 
-            <TextView
-                style="@style/TextAppearance.Material3.LabelLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/player_2" />
+                <RadioButton
+                    android:id="@+id/rb_singles"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Singles" />
 
-            <EditText
-                android:id="@+id/et_player2_name"
+                <RadioButton
+                    android:id="@+id/rb_doubles"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="Doubles" />
+            </RadioGroup>
+
+            <LinearLayout
+                android:id="@+id/singles_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:hint="@string/player_2_name_hint"
-                android:autofillHints="name"
-                android:inputType="textPersonName|textCapWords" />
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.Material3.LabelLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/player_1" />
+
+                <EditText
+                    android:id="@+id/et_player1_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="@string/player_1_name_hint"
+                    android:autofillHints="name"
+                    android:inputType="textPersonName|textCapWords" />
+
+                <TextView
+                    style="@style/TextAppearance.Material3.LabelLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/player_2" />
+
+                <EditText
+                    android:id="@+id/et_player2_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="@string/player_2_name_hint"
+                    android:autofillHints="name"
+                    android:inputType="textPersonName|textCapWords" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/doubles_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+                <TextView
+                    style="@style/TextAppearance.Material3.LabelLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Team A" />
+
+                <EditText
+                    android:id="@+id/et_team_a_player1_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="Player 1 Name"
+                    android:autofillHints="name"
+                    android:inputType="textPersonName|textCapWords" />
+
+                <EditText
+                    android:id="@+id/et_team_a_player2_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="Player 2 Name"
+                    android:autofillHints="name"
+                    android:inputType="textPersonName|textCapWords" />
+
+                <TextView
+                    style="@style/TextAppearance.Material3.LabelLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Team B" />
+
+                <EditText
+                    android:id="@+id/et_team_b_player1_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="Player 3 Name"
+                    android:autofillHints="name"
+                    android:inputType="textPersonName|textCapWords" />
+
+                <EditText
+                    android:id="@+id/et_team_b_player2_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="Player 4 Name"
+                    android:autofillHints="name"
+                    android:inputType="textPersonName|textCapWords" />
+
+            </LinearLayout>
 
             <TextView
                 style="@style/TextAppearance.Material3.LabelLarge"
