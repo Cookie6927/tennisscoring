@@ -16,9 +16,11 @@ public class Match {
     private String winnerName;
     private String matchTitle;
     private String matchVenue;
+    private String matchType;
+    private String detailedScore; // New field for per-set scores
     private long timestamp;
 
-    public Match(String player1Name, String player2Name, int player1Sets, int player2Sets, String winnerName, String matchTitle, String matchVenue, long timestamp) {
+    public Match(String player1Name, String player2Name, int player1Sets, int player2Sets, String winnerName, String matchTitle, String matchVenue, String matchType, String detailedScore, long timestamp) {
         this.player1Name = player1Name;
         this.player2Name = player2Name;
         this.player1Sets = player1Sets;
@@ -26,6 +28,8 @@ public class Match {
         this.winnerName = winnerName;
         this.matchTitle = matchTitle;
         this.matchVenue = matchVenue;
+        this.matchType = matchType;
+        this.detailedScore = detailedScore;
         this.timestamp = timestamp;
     }
 
@@ -46,6 +50,10 @@ public class Match {
     public void setMatchTitle(String matchTitle) { this.matchTitle = matchTitle; }
     public String getMatchVenue() { return matchVenue; }
     public void setMatchVenue(String matchVenue) { this.matchVenue = matchVenue; }
+    public String getMatchType() { return matchType; }
+    public void setMatchType(String matchType) { this.matchType = matchType; }
+    public String getDetailedScore() { return detailedScore; }
+    public void setDetailedScore(String detailedScore) { this.detailedScore = detailedScore; }
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 }

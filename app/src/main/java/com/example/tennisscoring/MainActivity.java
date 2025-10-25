@@ -3,6 +3,7 @@ package com.example.tennisscoring;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -23,16 +25,15 @@ import com.example.tennisscoring.database.Match;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Stack;
-import java.util.Date;
-import java.text.SimpleDateFormat;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     // Match Setup Data
-    private String player1Name, player2Name, matchTitle, matchVenue;
+    private String player1Name, player2Name, matchTitle, matchVenue, matchType;
     private int setsToWin;
 
     // UI Elements
@@ -54,11 +55,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int player2Points = 0;
     private int player2Games = 0;
     private int player2Sets = 0;
+    private ArrayList<String> setScores = new ArrayList<>();
 
     private boolean isPlayer1Serving = true;
-    private boolean isDeuce = false;
-    private boolean advantageP1 = false;
-    private boolean advantageP2 = false;
     private boolean matchOver = false;
 
     // Timer state
@@ -72,13 +71,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static class GameState {
         int p1Points, p1Games, p1Sets;
         int p2Points, p2Games, p2Sets;
-        boolean p1Serving, isDeuceState, advP1, advP2;
+        boolean p1Serving;
+        ArrayList<String> setScores;
 
-        GameState(int p1p, int p1g, int p1s, int p2p, int p2g, int p2s, boolean p1Serv, boolean isDeuce, boolean adv1, boolean adv2) {
+        GameState(int p1p, int p1g, int p1s, int p2p, int p2g, int p2s, boolean p1Serv, ArrayList<String> scores) {
             this.p1Points = p1p; this.p1Games = p1g; this.p1Sets = p1s;
             this.p2Points = p2p; this.p2Games = p2g; this.p2Sets = p2s;
-            this.p1Serving = p1Serv; this.isDeuceState = isDeuce;
-            this.advP1 = adv1; this.advP2 = adv2;
+            this.p1Serving = p1Serv;
+            this.setScores = new ArrayList<>(scores);
         }
     }
 
@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
-                    // If the callback is enabled, simply call the super implementation
                     if (isEnabled()) {
                         setEnabled(false);
                         onBackPressed();
@@ -116,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         player2Name = intent.getStringExtra("PLAYER_2_NAME");
         matchTitle = intent.getStringExtra("MATCH_TITLE");
         matchVenue = intent.getStringExtra("MATCH_VENUE");
+        matchType = intent.getStringExtra("MATCH_TYPE");
         isPlayer1Serving = intent.getIntExtra("FIRST_SERVER", 1) == 1;
         setsToWin = intent.getIntExtra("SETS_TO_WIN", 2);
     }
@@ -138,8 +138,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tvPlayer2Sets = findViewById(R.id.tv_player2_s);
         serverIndicatorP2 = findViewById(R.id.server_indicator_p2);
 
-        tvPlayer1Name.setText(player1Name);
-        tvPlayer2Name.setText(player2Name);
+        updatePlayerNames();
 
         btnAddPointP1 = findViewById(R.id.btn_add_point_p1);
         btnAddPointP1.setText("Add Point (" + player1Name + ")");
@@ -151,6 +150,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         btnEnd = findViewById(R.id.btn_end_match);
     }
 
+    private void updatePlayerNames() {
+        tvPlayer1Name.setText(player1Name);
+        tvPlayer2Name.setText(player2Name);
+    }
+
     private void setupNavigationDrawer() {
         setSupportActionBar(toolbar);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
@@ -158,6 +162,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setupClickListeners() {
@@ -177,7 +189,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         btnReset.setOnClickListener(v -> {
             HapticUtils.performHapticFeedback(this);
-            showResetDialog();
+            resetPoints();
+            updateUI();
         });
 
         btnEnd.setOnClickListener(v -> {
@@ -221,41 +234,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void addPoint(int player) {
         if (matchOver) return;
         saveCurrentState();
-        if (isDeuce) {
-            handleDeucePoint(player);
+
+        if (player == 1) {
+            player1Points++;
         } else {
-            handleRegularPoint(player);
+            player2Points++;
         }
-        updateUI();
-    }
 
-    private void handleRegularPoint(int player) {
-        if (player == 1) player1Points++;
-        else player2Points++;
-
-        if (player1Points >= 3 && player2Points >= 3) {
-            if (player1Points == player2Points) isDeuce = true;
-            else if (player1Points > 3) winGame(1);
-            else if (player2Points > 3) winGame(2);
-        } else if (player1Points > 3) {
+        if (player1Points >= 4 && player1Points - player2Points >= 2) {
             winGame(1);
-        } else if (player2Points > 3) {
+        } else if (player2Points >= 4 && player2Points - player1Points >= 2) {
             winGame(2);
         }
-    }
 
-    private void handleDeucePoint(int player) {
-        if (player == 1) {
-            if (advantageP1) winGame(1);
-            else if (advantageP2) { isDeuce = true; advantageP2 = false; }
-            else { isDeuce = false; advantageP1 = true; }
-        } else {
-            if (advantageP2) winGame(2);
-            else if (advantageP1) { isDeuce = true; advantageP1 = false; }
-            else { isDeuce = false; advantageP2 = true; }
-        }
+        updateUI();
     }
-
 
     private void winGame(int player) {
         if (player == 1) player1Games++;
@@ -274,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             player2Sets++;
         }
+        setScores.add(player1Games + "-" + player2Games);
         resetGames();
 
         if (player1Sets >= setsToWin) {
@@ -286,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void declareWinner(String winner) {
         matchOver = true;
         stopTimer();
-        endMatch(); // Call endMatch to save the result
+        endMatch();
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Match Over!")
                 .setMessage(winner + " wins the match!")
@@ -296,17 +290,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void updateUI() {
-        if(advantageP1) { tvPlayer1Points.setText("AD"); tvPlayer2Points.setText("40"); }
-        else if (advantageP2) { tvPlayer2Points.setText("AD"); tvPlayer1Points.setText("40"); }
-        else if (isDeuce) { tvPlayer1Points.setText("40"); tvPlayer2Points.setText("40"); }
-        else {
+        updatePlayerNames();
+
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true);
+        int defaultTextColor = typedValue.data;
+
+        int advantageColor = ContextCompat.getColor(this, R.color.advantage_red);
+
+        tvPlayer1Points.setTextColor(defaultTextColor);
+        tvPlayer2Points.setTextColor(defaultTextColor);
+        tvPlayer1Games.setTextColor(defaultTextColor);
+        tvPlayer2Games.setTextColor(defaultTextColor);
+        tvPlayer1Sets.setTextColor(defaultTextColor);
+        tvPlayer2Sets.setTextColor(defaultTextColor);
+        tvPlayer1Name.setTextColor(defaultTextColor);
+        tvPlayer2Name.setTextColor(defaultTextColor);
+        tvTimer.setTextColor(defaultTextColor);
+
+        if (player1Points >= 3 && player2Points >= 3) {
+            if (player1Points == player2Points) {
+                tvPlayer1Points.setText("Deuce");
+                tvPlayer2Points.setText("Deuce");
+                tvPlayer1Points.setTextColor(advantageColor);
+                tvPlayer2Points.setTextColor(advantageColor);
+            } else if (player1Points > player2Points) {
+                tvPlayer1Points.setText("Ad");
+                tvPlayer2Points.setText("40");
+                tvPlayer1Points.setTextColor(advantageColor);
+            } else {
+                tvPlayer2Points.setText("Ad");
+                tvPlayer1Points.setText("40");
+                tvPlayer2Points.setTextColor(advantageColor);
+            }
+        } else {
             tvPlayer1Points.setText(getPointString(player1Points));
             tvPlayer2Points.setText(getPointString(player2Points));
         }
 
         tvPlayer1Games.setText(String.valueOf(player1Games));
-        tvPlayer1Sets.setText(String.valueOf(player1Sets));
         tvPlayer2Games.setText(String.valueOf(player2Games));
+        tvPlayer1Sets.setText(String.valueOf(player1Sets));
         tvPlayer2Sets.setText(String.valueOf(player2Sets));
 
         serverIndicatorP1.setVisibility(isPlayer1Serving ? View.VISIBLE : View.INVISIBLE);
@@ -316,43 +340,49 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private String getPointString(int point) {
         switch (point) {
-            case 0: return "0"; case 1: return "15"; case 2: return "30"; case 3: return "40";
-            default: return "";
+            case 0: return "0";
+            case 1: return "15";
+            case 2: return "30";
+            case 3: return "40";
+            default: return "40";
         }
     }
 
     private void resetPoints() {
-        player1Points = 0; player2Points = 0; isDeuce = false;
-        advantageP1 = false; advantageP2 = false;
+        player1Points = 0; player2Points = 0;
     }
 
     private void resetGames() { player1Games = 0; player2Games = 0; }
 
     private void resetMatch() {
-        resetPoints(); resetGames();
-        player1Sets = 0; player2Sets = 0;
-        matchOver = false; history.clear();
+        resetPoints();
+        resetGames();
+        player1Sets = 0;
+        player2Sets = 0;
+        setScores.clear();
+        matchOver = false;
+        history.clear();
         startTimer();
         updateUI();
     }
 
     private void endMatch() {
         if (matchOver) {
-            stopTimer(); // Stop timer immediately
+            stopTimer();
         }
         matchOver = true;
 
-        // Correctly determine winner
         String winner;
         if (player1Sets > player2Sets) {
             winner = player1Name;
         } else if (player2Sets > player1Sets) {
             winner = player2Name;
-        } else { // If sets are tied (e.g., manual end), decide by games
+        } else { 
             winner = (player1Games > player2Games) ? player1Name : player2Name;
         }
 
-        // Correctly ordered constructor call
+        String detailedScore = String.join(", ", setScores);
+
         Match match = new Match(
                 player1Name,
                 player2Name,
@@ -361,6 +391,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 winner,
                 matchTitle,
                 matchVenue,
+                matchType,
+                detailedScore,
                 System.currentTimeMillis()
         );
 
@@ -391,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void saveCurrentState() {
         history.push(new GameState(player1Points, player1Games, player1Sets,
                 player2Points, player2Games, player2Sets,
-                isPlayer1Serving, isDeuce, advantageP1, advantageP2));
+                isPlayer1Serving, setScores));
     }
 
     private void undoLastPoint() {
@@ -399,8 +431,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             GameState lastState = history.pop();
             player1Points = lastState.p1Points; player1Games = lastState.p1Games; player1Sets = lastState.p1Sets;
             player2Points = lastState.p2Points; player2Games = lastState.p2Games; player2Sets = lastState.p2Sets;
-            isPlayer1Serving = lastState.p1Serving; isDeuce = lastState.isDeuceState;
-            advantageP1 = lastState.advP1; advantageP2 = lastState.advP2;
+            isPlayer1Serving = lastState.p1Serving;
+            setScores = new ArrayList<>(lastState.setScores);
             if (matchOver) { matchOver = false; startTimer(); }
             updateUI();
         }

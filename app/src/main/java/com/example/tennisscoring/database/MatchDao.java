@@ -14,4 +14,7 @@ public interface MatchDao {
 
     @Query("SELECT * FROM matches ORDER BY timestamp DESC")
     List<Match> getAllMatches();
+
+    @Query("DELETE FROM matches")
+    void deleteAll();
 }
