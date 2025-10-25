@@ -6,7 +6,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {Match.class}, version = 1)
+@Database(entities = {Match.class}, version = 4, exportSchema = false) // Version incremented to 4
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract MatchDao matchDao();
@@ -19,6 +19,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             AppDatabase.class, "tennis_scoring_db")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

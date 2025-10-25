@@ -87,12 +87,14 @@ public class MatchSetupActivity extends AppCompatActivity {
 
         int firstServer = (rgTossWon.getCheckedRadioButtonId() == R.id.rb_player1) ? 1 : 2;
         int setsToWin = spinnerMatchFormat.getSelectedItemPosition() == 0 ? 2 : 3; // Best of 3 sets needs 2 to win, Best of 5 needs 3.
+        String gameType = (rgGameType.getCheckedRadioButtonId() == R.id.rb_singles) ? "Singles" : "Doubles";
 
         Intent intent = new Intent(MatchSetupActivity.this, MainActivity.class);
         intent.putExtra("MATCH_TITLE", matchTitle);
         intent.putExtra("MATCH_VENUE", matchVenue);
         intent.putExtra("FIRST_SERVER", firstServer);
         intent.putExtra("SETS_TO_WIN", setsToWin);
+        intent.putExtra("MATCH_TYPE", gameType);
 
         if (rgGameType.getCheckedRadioButtonId() == R.id.rb_singles) {
             String p1Name = etPlayer1Name.getText().toString().trim();
@@ -102,7 +104,6 @@ public class MatchSetupActivity extends AppCompatActivity {
                 Toast.makeText(this, "Player names cannot be empty", Toast.LENGTH_SHORT).show();
                 return;
             }
-            intent.putExtra("GAME_TYPE", "singles");
             intent.putExtra("PLAYER_1_NAME", p1Name);
             intent.putExtra("PLAYER_2_NAME", p2Name);
         } else {
@@ -114,7 +115,6 @@ public class MatchSetupActivity extends AppCompatActivity {
                 Toast.makeText(this, "Player names for doubles cannot be empty", Toast.LENGTH_SHORT).show();
                 return;
             }
-            intent.putExtra("GAME_TYPE", "doubles");
             intent.putExtra("PLAYER_1_NAME", teamAP1 + " & " + teamAP2);
             intent.putExtra("PLAYER_2_NAME", teamBP1 + " & " + teamBP2);
         }

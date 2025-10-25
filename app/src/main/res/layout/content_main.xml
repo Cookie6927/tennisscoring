@@ -7,14 +7,44 @@
     android:padding="16dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <TextView
-        android:id="@+id/tv_timer"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="00:00:00"
-        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-        android:layout_marginBottom="16dp" />
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/tv_timer"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:text="00:00:00"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:gravity="start"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:text="Points"
+            android:textAppearance="@style/TextAppearance.Material3.TitleSmall" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:text="Game"
+            android:textAppearance="@style/TextAppearance.Material3.TitleSmall" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:text="Sets"
+            android:textAppearance="@style/TextAppearance.Material3.TitleSmall" />
+    </LinearLayout>
 
     <include layout="@layout/scoreboard" />
 
@@ -53,24 +83,28 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Undo"
+            android:textColor="?attr/colorOnSurface"
             android:layout_marginEnd="8dp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_reset"
-            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Reset"
+            android:textColor="?attr/colorOnSurface"
+            app:backgroundTint="@color/colorSecondaryLight"
             android:layout_marginStart="8dp"/>
 
     </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_end_match"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:textColor="?attr/colorOnSurface"
         android:text="End Match"/>
 
 </LinearLayout>

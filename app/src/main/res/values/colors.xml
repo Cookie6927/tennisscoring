@@ -28,5 +28,11 @@
     <color name="colorBackgroundDark">#121212</color>
     <color name="colorOnBackgroundDark">#FFFFFF</color>
     <color name="colorSurfaceDark">#1E1E1E</color>
-</resources>
+    
+    <color name="advantage_red">#FF0000</color>
+    <color name="winner_blue">#2196F3</color>
 
+    <!-- Landing Page Colors -->
+    <color name="landing_background">#4CAF50</color>
+
+</resources>

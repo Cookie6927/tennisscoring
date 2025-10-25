@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardElevation="8dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardElevation="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,47 +16,53 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:padding="16dp">
 
             <ImageView
                 android:id="@+id/server_indicator_p1"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:layout_gravity="center_vertical"
                 android:src="@drawable/ic_tennis_ball"
-                app:tint="?attr/colorPrimary" />
+                app:tint="?attr/colorPrimary"
+                android:layout_marginEnd="8dp"/>
 
             <TextView
                 android:id="@+id/tv_player1_name"
-                android:layout_width="0dp"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 tools:text="Player 1" />
 
             <TextView
-                android:id="@+id/tv_player1_s"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_player1_pt"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                tools:text="1" />
+                android:textColor="?attr/colorOnSurface"
+                tools:text="40" />
 
             <TextView
                 android:id="@+id/tv_player1_g"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                android:textColor="?attr/colorOnSurface"
                 tools:text="3" />
 
             <TextView
-                android:id="@+id/tv_player1_pt"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_player1_s"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                tools:text="40" />
+                android:textColor="?attr/colorOnSurface"
+                tools:text="1" />
 
         </LinearLayout>
 
@@ -70,47 +76,53 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:padding="16dp">
 
             <ImageView
                 android:id="@+id/server_indicator_p2"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_tennis_ball"
                 app:tint="?attr/colorPrimary" />
 
             <TextView
                 android:id="@+id/tv_player2_name"
-                android:layout_width="0dp"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 tools:text="Player 2" />
 
             <TextView
-                android:id="@+id/tv_player2_s"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_player2_pt"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                tools:text="0" />
+                android:textColor="?attr/colorOnSurface"
+                tools:text="15" />
 
             <TextView
                 android:id="@+id/tv_player2_g"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                android:textColor="?attr/colorOnSurface"
                 tools:text="5" />
 
             <TextView
-                android:id="@+id/tv_player2_pt"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_player2_s"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                tools:text="15" />
+                android:textColor="?attr/colorOnSurface"
+                tools:text="0" />
 
         </LinearLayout>
 
