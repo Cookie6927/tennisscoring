@@ -45,6 +45,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             startActivity(new Intent(this, MatchSetupActivity.class));
         } else if (id == R.id.nav_history) {
             startActivity(new Intent(this, HistoryActivity.class));
+        } else if (id == R.id.nav_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
