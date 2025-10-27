@@ -1,6 +1,9 @@
 package com.example.tennisscoring;
 
+import android.graphics.Canvas;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -8,8 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,9 +21,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-public class HistoryActivity extends AppCompatActivity {
+public class HistoryActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
     private HistoryAdapter historyAdapter;
@@ -33,10 +34,7 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setTitle("Match History");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupToolbar();
 
         recyclerView = findViewById(R.id.recycler_view_history);
         tvEmptyHistory = findViewById(R.id.tv_empty_history);
@@ -46,17 +44,77 @@ public class HistoryActivity extends AppCompatActivity {
         recyclerView.setAdapter(historyAdapter);
 
         loadMatches();
+        setupSwipeToDelete();
+    }
+
+    private void setupSwipeToDelete() {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            private final ColorDrawable background = new ColorDrawable();
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false; // We don't want to handle move gestures
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                showDeleteConfirmationDialog(position);
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                View itemView = viewHolder.itemView;
+
+                TypedValue typedValue = new TypedValue();
+                HistoryActivity.this.getTheme().resolveAttribute(com.google.android.material.R.attr.colorPrimary, typedValue, true);
+                int color = typedValue.data;
+
+                background.setColor(color);
+                background.setBounds(itemView.getLeft(), itemView.getTop(), itemView.getRight(), itemView.getBottom());
+                background.draw(c);
+            }
+        }).attachToRecyclerView(recyclerView);
+    }
+
+    private void showDeleteConfirmationDialog(final int position) {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Delete Match")
+                .setMessage("Are you sure you want to delete this match from your history?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    deleteMatch(position);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    historyAdapter.notifyItemChanged(position);
+                })
+                .setOnCancelListener(dialog -> {
+                    historyAdapter.notifyItemChanged(position);
+                })
+                .show();
+    }
+
+    private void deleteMatch(int position) {
+        Match matchToDelete = matches.get(position);
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            AppDatabase.getInstance(HistoryActivity.this).matchDao().delete(matchToDelete);
+            runOnUiThread(() -> {
+                matches.remove(position);
+                historyAdapter.notifyItemRemoved(position);
+                updateEmptyView();
+            });
+        });
     }
 
     private void loadMatches() {
-        new Thread(() -> {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
             matches.clear();
-            matches.addAll(AppDatabase.getInstance(this).matchDao().getAllMatches());
+            matches.addAll(AppDatabase.getInstance(HistoryActivity.this).matchDao().getAllMatches());
             runOnUiThread(() -> {
                 historyAdapter.notifyDataSetChanged();
                 updateEmptyView();
             });
-        }).start();
+        });
     }
 
     private void updateEmptyView() {
@@ -95,19 +153,13 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void clearHistory() {
-        new Thread(() -> {
-            AppDatabase.getInstance(this).matchDao().deleteAll();
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            AppDatabase.getInstance(HistoryActivity.this).matchDao().deleteAll();
             runOnUiThread(() -> {
                 matches.clear();
                 historyAdapter.notifyDataSetChanged();
                 updateEmptyView();
             });
-        }).start();
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        getOnBackPressedDispatcher().onBackPressed();
-        return true;
+        });
     }
 }

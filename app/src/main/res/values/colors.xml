@@ -35,4 +35,9 @@
     <!-- Landing Page Colors -->
     <color name="landing_background">#4CAF50</color>
 
+    <!-- Match Summary Colors -->
+    <color name="summary_background">#F5F5F5</color>
+    <color name="summary_toolbar_green">#4CAF50</color>
+    <color name="summary_winner_green">#4CAF50</color>
+    <color name="summary_button_green">#4CAF50</color>
 </resources>

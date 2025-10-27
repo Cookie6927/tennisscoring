@@ -12,10 +12,7 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-public class MatchSetupActivity extends AppCompatActivity {
+public class MatchSetupActivity extends BaseActivity {
 
     private EditText etMatchTitle, etMatchVenue, etPlayer1Name, etPlayer2Name;
     private EditText etTeamAPlayer1Name, etTeamAPlayer2Name, etTeamBPlayer1Name, etTeamBPlayer2Name;
@@ -31,10 +28,8 @@ public class MatchSetupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match_setup);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setupToolbar();
         getSupportActionBar().setTitle("New Match Setup");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         etMatchTitle = findViewById(R.id.et_match_title);
         etMatchVenue = findViewById(R.id.et_match_venue);
@@ -121,11 +116,5 @@ public class MatchSetupActivity extends AppCompatActivity {
         
         startActivity(intent);
         finish();
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        getOnBackPressedDispatcher().onBackPressed();
-        return true;
     }
 }

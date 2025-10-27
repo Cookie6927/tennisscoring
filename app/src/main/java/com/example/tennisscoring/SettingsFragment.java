@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -28,6 +29,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals("theme")) {
             ThemeUtils.applyTheme(requireContext());
+        } else if (key.equals("haptic_feedback")) {
+            // The value is already saved, we just need to react to it if necessary
+            // In this case, HapticUtils will read the preference directly, so no action is needed here
+            // However, it's good practice to acknowledge the change.
+            boolean hapticEnabled = sharedPreferences.getBoolean(key, true);
+            // You could add a toast or log here if you wanted to confirm the change
         }
     }
 }
