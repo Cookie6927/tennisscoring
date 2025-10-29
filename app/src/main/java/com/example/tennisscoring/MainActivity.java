@@ -4,44 +4,30 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.TypedValue;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.tennisscoring.database.AppDatabase;
 import com.example.tennisscoring.database.Match;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Stack;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity {
 
     // Match Setup Data
     private String player1Name, player2Name, matchTitle, matchVenue, matchType;
     private int setsToWin;
 
     // UI Elements
-    private DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle drawerToggle;
-    private Toolbar toolbar;
-    private NavigationView navigationView;
-
     private TextView tvTimer, tvPlayer1Points, tvPlayer1Games, tvPlayer1Sets;
     private TextView tvPlayer2Points, tvPlayer2Games, tvPlayer2Sets;
     private TextView tvPlayer1Name, tvPlayer2Name;
@@ -90,23 +76,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         retrieveMatchData();
         initializeUI();
-        setupNavigationDrawer();
+        setupToolbar();
         setupClickListeners();
         resetMatch();
-
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                } else {
-                    if (isEnabled()) {
-                        setEnabled(false);
-                        onBackPressed();
-                    }
-                }
-            }
-        });
     }
 
     private void retrieveMatchData() {
@@ -121,9 +93,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void initializeUI() {
-        toolbar = findViewById(R.id.toolbar);
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
         tvTimer = findViewById(R.id.tv_timer);
 
         tvPlayer1Name = findViewById(R.id.tv_player1_name);
@@ -155,23 +124,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tvPlayer2Name.setText(player2Name);
     }
 
-    private void setupNavigationDrawer() {
-        setSupportActionBar(toolbar);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     private void setupClickListeners() {
         btnAddPointP1.setOnClickListener(v -> {
             HapticUtils.performHapticFeedback(this);
@@ -198,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             new MaterialAlertDialogBuilder(this)
                 .setTitle("End Match")
                 .setMessage("Are you sure you want to end the current match?")
-                .setPositiveButton("End Match", (dialog, which) -> endMatch())
+                .setPositiveButton("End Match", (dialog, which) -> endMatch(false, ""))
                 .setNegativeButton("Cancel", null)
                 .show();
         });
@@ -211,24 +163,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPositiveButton("Yes, Reset", (dialog, which) -> resetMatch())
                 .setNegativeButton("Cancel", null)
                 .show();
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        HapticUtils.performHapticFeedback(this);
-        if (id == R.id.nav_home) {
-            finish();
-        } else if (id == R.id.nav_history) {
-            startActivity(new Intent(MainActivity.this, HistoryActivity.class));
-        } else if (id == R.id.nav_settings) {
-            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-        } else if (id == R.id.nav_reset) {
-            showResetDialog();
-        }
-
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     private void addPoint(int player) {
@@ -280,13 +214,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void declareWinner(String winner) {
         matchOver = true;
         stopTimer();
-        endMatch();
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Match Over!")
-                .setMessage(winner + " wins the match!")
-                .setPositiveButton("OK", (dialog, which) -> finish())
-                .setCancelable(false)
-                .show();
+        endMatch(true, winner);
     }
 
     private void updateUI() {
@@ -366,20 +294,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         updateUI();
     }
 
-    private void endMatch() {
+    private void endMatch(boolean isWinnerDeclared, String winner) {
         if (matchOver) {
             stopTimer();
         }
         matchOver = true;
-
-        String winner;
-        if (player1Sets > player2Sets) {
-            winner = player1Name;
-        } else if (player2Sets > player1Sets) {
-            winner = player2Name;
-        } else { 
-            winner = (player1Games > player2Games) ? player1Name : player2Name;
-        }
 
         String detailedScore = String.join(", ", setScores);
 
@@ -393,15 +312,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 matchVenue,
                 matchType,
                 detailedScore,
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
+                seconds
         );
 
-        new Thread(() -> AppDatabase.getInstance(getApplicationContext()).matchDao().insert(match)).start();
-
-        if (!isFinishing()) {
-            finish();
-        }
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            long matchId = AppDatabase.getInstance(getApplicationContext()).matchDao().insert(match);
+            runOnUiThread(() -> {
+                if (isWinnerDeclared) {
+                    Intent intent = new Intent(MainActivity.this, MatchSummaryActivity.class);
+                    intent.putExtra("MATCH_ID", matchId);
+                    startActivity(intent);
+                    finish(); // Finish MainActivity after starting summary
+                } else {
+                    finish(); // Finish if match is ended manually without a winner
+                }
+            });
+        });
     }
+
 
     private void startTimer() {
         seconds = 0;

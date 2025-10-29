@@ -1,18 +1,21 @@
 package com.example.tennisscoring;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tennisscoring.database.Match;
@@ -23,6 +26,7 @@ import java.util.List;
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
 
     private final List<Match> matches;
+    private static final String TAG = "HistoryAdapter";
 
     public HistoryAdapter(List<Match> matches) {
         this.matches = matches;
@@ -39,6 +43,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     public void onBindViewHolder(@NonNull HistoryViewHolder holder, int position) {
         Match match = matches.get(position);
         holder.bind(match);
+
+        holder.itemView.setOnClickListener(v -> {
+            Log.d(TAG, "Item clicked. Match ID: " + match.getId());
+            Context context = v.getContext();
+            Intent intent = new Intent(context, MatchSummaryActivity.class);
+            intent.putExtra("MATCH_ID", match.getId());
+            context.startActivity(intent);
+        });
     }
 
     @Override
@@ -52,6 +64,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         private final TextView tvPlayerNames;
         private final TextView tvMatchScore;
         private final TextView tvMatchDate;
+        private final TextView tvMatchVenue;
+        private final TextView tvMatchTitle;
 
         public HistoryViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -59,12 +73,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             tvPlayerNames = itemView.findViewById(R.id.tv_player_names);
             tvMatchScore = itemView.findViewById(R.id.tv_match_score);
             tvMatchDate = itemView.findViewById(R.id.tv_match_date);
+            tvMatchVenue = itemView.findViewById(R.id.tv_match_venue);
+            tvMatchTitle = itemView.findViewById(R.id.tv_match_title);
         }
 
         public void bind(Match match) {
             Context context = itemView.getContext();
 
-            // Set Match Type (Safely)
             if (match.getMatchType() != null && !match.getMatchType().isEmpty()) {
                 chipMatchType.setText(match.getMatchType());
                 chipMatchType.setVisibility(View.VISIBLE);
@@ -72,17 +87,32 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 chipMatchType.setVisibility(View.GONE);
             }
 
-            // Set Date
+            if (match.getMatchVenue() != null && !match.getMatchVenue().isEmpty()) {
+                tvMatchVenue.setText(match.getMatchVenue());
+                tvMatchVenue.setVisibility(View.VISIBLE);
+            } else {
+                tvMatchVenue.setVisibility(View.GONE);
+            }
+
+            if (match.getMatchTitle() != null && !match.getMatchTitle().isEmpty()) {
+                tvMatchTitle.setText(match.getMatchTitle());
+                tvMatchTitle.setVisibility(View.VISIBLE);
+            } else {
+                tvMatchTitle.setVisibility(View.GONE);
+            }
+
             tvMatchDate.setText(DateUtils.getRelativeTimeSpanString(match.getTimestamp(), System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS));
 
-            // --- Player Names Coloring ---
             String p1Name = match.getPlayer1Name() != null ? match.getPlayer1Name() : "Player 1";
             String p2Name = match.getPlayer2Name() != null ? match.getPlayer2Name() : "Player 2";
             String playerNamesString = p1Name + " vs " + p2Name;
             Spannable coloredPlayerNames = new SpannableString(playerNamesString);
 
             String winnerName = match.getWinnerName();
-            int winnerColor = ContextCompat.getColor(context, R.color.winner_blue);
+
+            TypedValue typedValue = new TypedValue();
+            context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorPrimary, typedValue, true);
+            int winnerColor = typedValue.data;
 
             if (winnerName != null) {
                 if (winnerName.equals(p1Name)) {
@@ -96,7 +126,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             }
             tvPlayerNames.setText(coloredPlayerNames);
 
-            // --- Detailed Score Coloring ---
             String detailedScore = match.getDetailedScore();
             if (detailedScore != null && !detailedScore.isEmpty()) {
                 SpannableStringBuilder scoreBuilder = new SpannableStringBuilder();
@@ -111,27 +140,28 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                             int p2Games = Integer.parseInt(points[1].trim());
 
                             SpannableString spannableSetScore = new SpannableString(setScore);
-                            if (p1Games > p2Games) { // Player 1 won the set
-                                spannableSetScore.setSpan(new ForegroundColorSpan(winnerColor), 0, points[0].length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            } else if (p2Games > p1Games) { // Player 2 won the set
-                                spannableSetScore.setSpan(new ForegroundColorSpan(winnerColor), points[0].length() + 1, setScore.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            if (winnerName != null) {
+                                if (winnerName.equals(p1Name) && p1Games > p2Games) {
+                                    spannableSetScore.setSpan(new ForegroundColorSpan(winnerColor), 0, points[0].length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                } else if (winnerName.equals(p2Name) && p2Games > p1Games) {
+                                    spannableSetScore.setSpan(new ForegroundColorSpan(winnerColor), points[0].length() + 1, setScore.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                }
                             }
                             scoreBuilder.append(spannableSetScore);
 
                         } catch (NumberFormatException e) {
-                            scoreBuilder.append(setScore); // Append as plain text if parsing fails
+                            scoreBuilder.append(setScore);
                         }
                     } else {
-                        scoreBuilder.append(setScore); // Append as plain text if format is wrong
+                        scoreBuilder.append(setScore);
                     }
 
                     if (i < setScores.length - 1) {
-                        scoreBuilder.append(", "); // Add separator back
+                        scoreBuilder.append(", ");
                     }
                 }
                 tvMatchScore.setText(scoreBuilder);
             } else {
-                // Fallback for old data
                 tvMatchScore.setText(match.getPlayer1Sets() + "-" + match.getPlayer2Sets());
             }
         }

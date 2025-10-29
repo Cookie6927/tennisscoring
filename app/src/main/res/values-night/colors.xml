@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Dark Theme -->
+    <color name="colorPrimaryDark">#66BB6A</color> <!-- Lighter Green for Dark Mode -->
+    <color name="colorPrimaryVariantDark">#4CAF50</color>
+    <color name="colorOnPrimaryDark">#000000</color>
+    <color name="colorSecondaryDark">#FFCA28</color> <!-- Lighter Yellow for Dark Mode -->
+    <color name="colorOnSecondaryDark">#000000</color>
+    <color name="colorErrorDark">#EF5350</color> <!-- Lighter Red for Dark Mode -->
+    <color name="colorBackgroundDark">#121212</color>
+    <color name="colorOnBackgroundDark">#FFFFFF</color>
+    <color name="colorSurfaceDark">#1E1E1E</color>
     <color name="landing_background">#000000</color>
 </resources>

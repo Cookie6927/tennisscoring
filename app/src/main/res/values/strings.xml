@@ -20,4 +20,21 @@
     <string name="player_2_name_hint">Enter Player 2 Name</string>
     <string name="match_format">Match Format</string>
     <string name="start_match">Start Match</string>
+
+    <!-- Match Summary Screen -->
+    <string name="match_summary">Match Summary</string>
+    <string name="winner">Winner</string>
+    <string name="player">Player</string>
+    <string name="set_1">Set 1</string>
+    <string name="set_2">Set 2</string>
+    <string name="set_3">Set 3</string>
+    <string name="set_4">Set 4</string>
+    <string name="set_5">Set 5</string>
+    <string name="match_duration">Match Duration: %1$d hour %2$d minutes</string>
+    <string name="share_result">Share Result</string>
+    <string name="start_new_match">Start New Match</string>
+    <string name="no_match_history">No match history available.</string>
+    <string name="home">Home</string>
+    <string name="new_match">New Match</string>
+    <string name="match_history">Match History</string>
 </resources>

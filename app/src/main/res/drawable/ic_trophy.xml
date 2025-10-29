@@ -1,0 +1,47 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+
+    <!-- Laurel Wreath -->
+    <path
+        android:strokeColor="#FFC107"
+        android:strokeWidth="40"
+        android:strokeLineCap="round"
+        android:pathData="M320,220 C100,420 270,740 450,840"/>
+    <path
+        android:strokeColor="#FFC107"
+        android:strokeWidth="40"
+        android:strokeLineCap="round"
+        android:pathData="M640,220 C860,420 690,740 510,840"/>
+
+    <!-- Trophy Cup -->
+    <path
+        android:fillColor="#FFC107"
+        android:pathData="M320,160h320v240c0,88.37 -71.63,160 -160,160s-160,-71.63 -160,-160V160Z"/>
+
+    <!-- Trophy Handles -->
+    <path
+        android:strokeColor="#FFC107"
+        android:strokeWidth="40"
+        android:strokeLineCap="round"
+        android:pathData="M320,240 C200,280 200,400 320,440"/>
+    <path
+        android:strokeColor="#FFC107"
+        android:strokeWidth="40"
+        android:strokeLineCap="round"
+        android:pathData="M640,240 C760,280 760,400 640,440"/>
+
+    <!-- Trophy Base -->
+    <path
+        android:fillColor="#FFC107"
+        android:pathData="M400,560h160v40H400Z"/>
+    <path
+        android:fillColor="#795548"
+        android:pathData="M360,600h240v40H360Z"/>
+    <path
+        android:fillColor="#A1887F"
+        android:pathData="M320,640h320v40H320Z"/>
+
+</vector>

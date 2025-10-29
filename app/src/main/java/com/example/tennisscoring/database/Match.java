@@ -19,8 +19,9 @@ public class Match {
     private String matchType;
     private String detailedScore; // New field for per-set scores
     private long timestamp;
+    private long duration; // New field for match duration in seconds
 
-    public Match(String player1Name, String player2Name, int player1Sets, int player2Sets, String winnerName, String matchTitle, String matchVenue, String matchType, String detailedScore, long timestamp) {
+    public Match(String player1Name, String player2Name, int player1Sets, int player2Sets, String winnerName, String matchTitle, String matchVenue, String matchType, String detailedScore, long timestamp, long duration) {
         this.player1Name = player1Name;
         this.player2Name = player2Name;
         this.player1Sets = player1Sets;
@@ -31,6 +32,7 @@ public class Match {
         this.matchType = matchType;
         this.detailedScore = detailedScore;
         this.timestamp = timestamp;
+        this.duration = duration;
     }
 
     // Getters and Setters
@@ -56,4 +58,6 @@ public class Match {
     public void setDetailedScore(String detailedScore) { this.detailedScore = detailedScore; }
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+    public long getDuration() { return duration; }
+    public void setDuration(long duration) { this.duration = duration; }
 }
